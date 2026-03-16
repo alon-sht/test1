@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <title>Mol* Morph Viewer</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/molstar@latest/build/viewer/molstar.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; overflow: hidden; background: #111; color: white; }
+        #controls { display: flex; justify-content: center; width: 100%; margin-bottom: 10px; z-index: 1; padding: 10px; }
+        button { margin: 5px; padding: 10px 20px; font-size: 14px; cursor: pointer; background: #444; color: white; border: none; border-radius: 4px; }
+        button:hover { background: #666; }
+        #viewer-container { width: 100%; height: 100%; border: 1px solid #333; position: relative; }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <button onclick="loadMyMorph()">Reload morph_test.pdb</button>
+        <button onclick="startAnimation()">Play Morph Animation</button>
+    </div>
+    <div id="viewer-container">
+        <div id="meso-viewer" style="position: relative; width: 100%; height: 100%;"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/molstar@latest/build/viewer/molstar.js"></script>
+    
+    <script type="text/javascript">
+        let viewer;
+
+        // 1. Initialize the viewer
+        molstar.Viewer.create('meso-viewer', {
+            layoutShowControls: true,
+            viewportShowExpand: false,
+            layoutIsExpanded: false,
+            powerPreference: 'high-performance',
+        }).then(v => {
+            viewer = v;
+            loadMyMorph(); // Load your file automatically on startup
+        });
+
+        // 2. Function to load your specific local PDB
+        async function loadMyMorph() {
+            if (viewer) {
+                await viewer.clear(); // Clear existing models
+                // Use loadAllModelsOrFull to ensure all frames of the morph are loaded
+                await viewer.loadAllModelsOrFull('./morph_test.pdb', 'pdb');
+            }
+        }
+
+        // 3. Function to trigger the "Morph" playback
+        function startAnimation() {
+            if (viewer) {
+                viewer.plugin.managers.animation.play(
+                    viewer.plugin.builders.animation.main, 
+                    { durationInMs: 3000, backAndForth: true }
+                );
+            }
+        }
+    </script>
+</body>
+</html>
