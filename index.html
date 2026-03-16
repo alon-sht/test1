@@ -25,38 +25,28 @@
 
     <script src="https://cdn.jsdelivr.net/npm/molstar@latest/build/viewer/molstar.js"></script>
     
-  <script type="text/javascript">
+<script type="text/javascript">
     let viewer;
 
-    // 1. Initialize the viewer
     molstar.Viewer.create('meso-viewer', {
-        layoutShowControls: true,
-        viewportShowExpand: false,
-        collapseLeftPanel: true,
-        pdbProvider: 'rcsb', // Ensures it looks at the US-based archive
+        // This section removes all the "clutter"
+        layoutShowControls: false,    // Removes sidebars
+        layoutShowRemoteState: false, // Removes bottom status bar
+        layoutShowSequence: false,    // Removes top sequence bar
+        layoutShowLog: false,         // Removes the console log at the bottom
+        viewportShowExpand: false,    // Removes the full-screen toggle
+        viewportShowSelectionMode: false, // Removes the mouse-selection toggle
+        
+        pdbProvider: 'rcsb',
     }).then(v => {
         viewer = v;
         
-        // Wait 500ms to ensure the engine is fully "warmed up"
-        setTimeout(() => {
-            loadPublicStructure('1tnf');
-        }, 500);
+        // Load the structure
+        viewer.loadPdb('1tnf');
+
+        // Optional: Change background to something specific if you want
+        // viewer.canvas.setProps({ backgroundColor: 0x111111 });
     });
-
-    async function loadPublicStructure(pdbId) {
-        try {
-            // Method A: Standard Archive Load (Best for public IDs like 1tnf)
-            await viewer.loadPdb(pdbId);
-            
-            // Method B: If Method A fails, this is the "Brute Force" URL method
-            // await viewer.loadAllModelsOrFull(`https://files.rcsb.org/download/${pdbId}.pdb`, 'pdb');
-
-            console.log("Structure Loaded!");
-            viewer.plugin.managers.camera.reset(); // Snap the camera to the protein
-        } catch (e) {
-            console.error("Load failed:", e);
-        }
-    }
 </script>
 </body>
 </html>
