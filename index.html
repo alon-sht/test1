@@ -25,38 +25,44 @@
 
     <script src="https://cdn.jsdelivr.net/npm/molstar@latest/build/viewer/molstar.js"></script>
     
-    <script type="text/javascript">
-        let viewer;
+   <script type="text/javascript">
+    let viewer;
 
-        // 1. Initialize the viewer
-        molstar.Viewer.create('meso-viewer', {
-            layoutShowControls: true,
-            viewportShowExpand: false,
-            layoutIsExpanded: false,
-            powerPreference: 'high-performance',
-        }).then(v => {
-            viewer = v;
-            loadMyMorph(); // Load your file automatically on startup
-        });
+    molstar.Viewer.create('meso-viewer', {
+        layoutShowControls: true,
+        viewportShowExpand: false,
+        collapseLeftPanel: true,
+    }).then(v => {
+        viewer = v;
+        loadMyPDB();
+    });
 
-        // 2. Function to load your specific local PDB
-        async function loadMyMorph() {
-            if (viewer) {
-                await viewer.clear(); // Clear existing models
-                // Use loadAllModelsOrFull to ensure all frames of the morph are loaded
-                await viewer.loadAllModelsOrFull('./morph_test.pdb', 'pdb');
-            }
+    async function loadMyPDB() {
+        try {
+            // We use a relative path. 
+            // IMPORTANT: Ensure this matches your GitHub filename EXACTLY.
+            const url = './morph_test.pdb'; 
+            
+            await viewer.loadAllModelsOrFull(url, 'pdb');
+            
+            // This ensures the camera zooms to the protein once loaded
+            viewer.plugin.managers.camera.reset();
+            
+            console.log("PDB loaded successfully");
+        } catch (e) {
+            console.error("Detailed Loading Error:", e);
+            alert("Could not load PDB. Check if the filename matches exactly (case-sensitive) and that the file is in the same folder on GitHub.");
         }
+    }
 
-        // 3. Function to trigger the "Morph" playback
-        function startAnimation() {
-            if (viewer) {
-                viewer.plugin.managers.animation.play(
-                    viewer.plugin.builders.animation.main, 
-                    { durationInMs: 3000, backAndForth: true }
-                );
-            }
+    function startAnimation() {
+        if (viewer) {
+            viewer.plugin.managers.animation.play(
+                viewer.plugin.builders.animation.main, 
+                { durationInMs: 4000, backAndForth: true }
+            );
         }
-    </script>
+    }
+</script>
 </body>
 </html>
