@@ -25,42 +25,36 @@
 
     <script src="https://cdn.jsdelivr.net/npm/molstar@latest/build/viewer/molstar.js"></script>
     
-   <script type="text/javascript">
+  <script type="text/javascript">
     let viewer;
 
+    // 1. Initialize the viewer
     molstar.Viewer.create('meso-viewer', {
         layoutShowControls: true,
         viewportShowExpand: false,
         collapseLeftPanel: true,
+        pdbProvider: 'rcsb', // Ensures it looks at the US-based archive
     }).then(v => {
         viewer = v;
-        loadMyPDB();
+        
+        // Wait 500ms to ensure the engine is fully "warmed up"
+        setTimeout(() => {
+            loadPublicStructure('1tnf');
+        }, 500);
     });
 
-    async function loadMyPDB() {
+    async function loadPublicStructure(pdbId) {
         try {
-            // We use a relative path. 
-            // IMPORTANT: Ensure this matches your GitHub filename EXACTLY.
-            const url = './morph_test.pdb'; 
+            // Method A: Standard Archive Load (Best for public IDs like 1tnf)
+            await viewer.loadPdb(pdbId);
             
-            await viewer.loadAllModelsOrFull(url, 'pdb');
-            
-            // This ensures the camera zooms to the protein once loaded
-            viewer.plugin.managers.camera.reset();
-            
-            console.log("PDB loaded successfully");
-        } catch (e) {
-            console.error("Detailed Loading Error:", e);
-            alert("Could not load PDB. Check if the filename matches exactly (case-sensitive) and that the file is in the same folder on GitHub.");
-        }
-    }
+            // Method B: If Method A fails, this is the "Brute Force" URL method
+            // await viewer.loadAllModelsOrFull(`https://files.rcsb.org/download/${pdbId}.pdb`, 'pdb');
 
-    function startAnimation() {
-        if (viewer) {
-            viewer.plugin.managers.animation.play(
-                viewer.plugin.builders.animation.main, 
-                { durationInMs: 4000, backAndForth: true }
-            );
+            console.log("Structure Loaded!");
+            viewer.plugin.managers.camera.reset(); // Snap the camera to the protein
+        } catch (e) {
+            console.error("Load failed:", e);
         }
     }
 </script>
